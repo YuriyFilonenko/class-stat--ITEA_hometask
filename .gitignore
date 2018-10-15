@@ -1,0 +1,11 @@
+# Composer itself is not needed
+composer.phar
+
+# Composer vendor dir
+/vendor/
+
+# Mac DS_Store Files
+.DS_Store
+
+# PHP CS Fixer cache
+php_cs.cache
