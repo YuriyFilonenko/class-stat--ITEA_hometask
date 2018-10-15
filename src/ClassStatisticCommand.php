@@ -6,7 +6,6 @@ use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\{InputArgument, InputInterface};
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Implements logic for class statistic
@@ -16,14 +15,12 @@ use Symfony\Component\Finder\Finder;
 class ClassStatisticCommand extends Command
 {
     private $srcDir;
-    private $rootNamespace;
     
-    public function __construct(string $srcDir, string $rootNamespace, mixed $name = null)
+    public function __construct(string $srcDir, string $name = null)
     {
         parent::__construct($name);
         
         $this->srcDir = $srcDir;
-        $this->rootNamespace = $rootNamespace;
     }
 
     /**
@@ -37,7 +34,7 @@ class ClassStatisticCommand extends Command
             ->addArgument(
                 'class',
                 InputArgument::REQUIRED,
-                'Class for statistic'
+                "'Full class name'"
             )
         ;
     }
@@ -49,38 +46,13 @@ class ClassStatisticCommand extends Command
     {
         $class = $input->getArgument('class');
         
-        $finder = new Finder();
-        $finder
-            ->files()
-            ->in($this->srcDir)
-            ->name('/^[A-Z].+\.php$/')
-        ;
-        
-        foreach ($finder as $file) {
-            $path = $file->getRelativePathname();
-            $className = \rtrim($path, '.php');
-            $fullClassName = $this->rootNamespace . '\\' . \rtrim($path, '.php');
-            $flag = false;
-
-            if ($class == $className) {
-                $reflector = new ReflectionClass($fullClassName);
-                $flag = true;
-                break;
-            }
-        }
-        
-        if (!$flag) {
-            throw new \RuntimeException("Class $class not found!");
-        }
-        
-        $isFinal = $reflector->isFinal();
-        $isAbstarct = $reflector->isAbstract();
+        $reflector = new ReflectionClass($class);
         
         $outputClassName = '';
 
-        if ($isFinal) {
+        if ($reflector->isFinal()) {
             $outputClassName = "$class (Final class)";
-        } elseif ($isAbstarct) {
+        } elseif ($reflector->isAbstract()) {
             $outputClassName = "$class (Abstract class)";
         } else {
             $outputClassName = "$class";
@@ -113,13 +85,13 @@ class ClassStatisticCommand extends Command
         $output->writeln(
             "Class: $outputClassName" . \PHP_EOL
             . 'Propertyes:' . \PHP_EOL
-            . "    public: $countOfPublicProperties" . \PHP_EOL
-            . "    protected: $countOfProtectedProperties" . \PHP_EOL
-            . "    private: $countOfPrivateProperties" . \PHP_EOL
+            . "\t" . "public: $countOfPublicProperties" . \PHP_EOL
+            . "\t" . "protected: $countOfProtectedProperties" . \PHP_EOL
+            . "\t" . "private: $countOfPrivateProperties" . \PHP_EOL
             . 'Methods:' . \PHP_EOL
-            . "    public: $countOfPublicMethods" . \PHP_EOL
-            . "    protected: $countOfProtectedMethods" . \PHP_EOL
-            . "    private: $countOfPrivateMethods" . \PHP_EOL
+            . "\t" . "public: $countOfPublicMethods" . \PHP_EOL
+            . "\t" . "protected: $countOfProtectedMethods" . \PHP_EOL
+            . "\t" . "private: $countOfPrivateMethods" . \PHP_EOL
         );
     }
 }
