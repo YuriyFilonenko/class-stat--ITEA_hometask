@@ -8,9 +8,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $application = new Application('Class-stat v1.0');
 
-$application->add(new ClassStatisticCommand(
-        __DIR__ . '/../src/'
-));
+$application->add(new ClassStatisticCommand());
 
 $exitCode = $application->run();
 exit($exitCode);

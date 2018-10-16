@@ -14,15 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ClassStatisticCommand extends Command
 {
-    private $srcDir;
-    
-    public function __construct(string $srcDir, string $name = null)
-    {
-        parent::__construct($name);
-        
-        $this->srcDir = $srcDir;
-    }
-
     /**
      * {@inheritdoc}
      */
